@@ -69,4 +69,45 @@ class TestShip < Minitest::Test
     @s.shot(1)
     assert_equal false, @s.shot_hits_ship?(1)
   end
+
+  def test_ships_return_health_percentage
+    assert_equal 100, @s.health_left_percentage
+    @s.shot(1)
+    assert_equal 50, @s.health_left_percentage
+  end
+
+  def test_large_ships_return_health_percentage
+    ship = Ship.new(3)
+    ship_2 = Ship.new(5)
+    ship.shot(0)
+    ship.shot(1)
+    assert_equal 33, ship.health_left_percentage
+    ship_2.shot(4)
+    ship_2.shot(3)
+    ship_2.shot(2)
+    assert_equal 40, ship_2.health_left_percentage
+  end
+
+  def test_ships_display_remaining_health_bar
+    assert_equal "[********************]", @s.health_bar
+    @s.shot(1)
+    assert_equal "[**********          ]", @s.health_bar
+  end
+
+  def test_large_ships_display_remaining_health_bar
+    ship = Ship.new(6)
+    ship.shot(0)
+    ship.shot(1)
+    assert_equal "[*************       ]", ship.health_bar
+    ship.shot(2)
+    assert_equal "[**********          ]", ship.health_bar
+    ship.shot(3)
+    assert_equal "[******              ]", ship.health_bar
+  end
+
+  def test_sunken_ships_display_sad_health_bar
+    @s.shot(0)
+    @s.shot(1)
+    assert_equal "[xX UNDER THE SEA! Xx]", @s.health_bar
+  end
 end

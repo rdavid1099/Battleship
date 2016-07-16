@@ -28,4 +28,19 @@ class Ship
   def shot_hits_ship?(location)
     location < size && @current_state[location] != 'X'
   end
+
+  def health_left_percentage
+    ((remaining_health / size.to_f) * 100).round
+  end
+
+  def remaining_health
+    @current_state.find_all { |damage| damage == 'O' }.length
+  end
+
+  def health_bar
+    return "[xX UNDER THE SEA! Xx]" if under_the_sea?
+    health_bar_length = health_left_percentage/5
+    empty_space = 20 - health_bar_length
+    "[" + "*"*health_bar_length + " "*empty_space + "]"
+  end
 end
