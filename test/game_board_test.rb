@@ -122,4 +122,66 @@ class TestGameBoard < Minitest::Test
                   [".",".",".","."],
                   [".",".",".","."]], @g.current_game_board
   end
+
+  def test_game_board_generates_display
+    assert_respond_to @g, :generate_current_display
+  end
+
+  def test_game_board_generates_border_relevant_to_board_size
+    @g.create_new_board(2)
+    assert_equal "========\n", @g.generate_border
+    @g.create_new_board(3)
+    assert_equal "===========\n", @g.generate_border
+  end
+
+  def test_game_board_genernates_column_numbers_relevant_to_board_size
+    @g.create_new_board(2)
+    assert_equal ".  1  2 \n", @g.generate_column_numbers
+    @g.create_new_board(3)
+    assert_equal ".  1  2  3 \n", @g.generate_column_numbers
+  end
+
+  def test_game_board_generates_a_line_of_the_display
+    @g.create_new_board(1)
+    assert_equal "A    \n", @g.generate_display_lines
+  end
+
+  def test_game_generates_two_lines_of_the_display
+    @g.create_new_board(2)
+    assert_equal "A       \nB       \n", @g.generate_display_lines
+  end
+
+  def test_game_board_displays_2x2_board
+    @g.create_new_board(2)
+    assert_equal "========\n.  1  2 \nA       \nB       \n========\n", @g.generate_current_display
+  end
+
+  def test_game_board_displays_4x4_board
+    assert_equal "==============\n.  1  2  3  4 \nA             \nB             \nC             \nD             \n==============\n", @g.generate_current_display
+  end
+
+  def test_board_evaluates_shots_on_given_display_line
+    @g.create_new_board(2)
+    @g.mark_shot(0,0)
+    assert_equal "A  S    \n", @g.evaluate_shots_on_line(0)
+  end
+
+  def test_game_board_display_lines_update_after_shot_fired
+    @g.create_new_board(2)
+    @g.mark_shot(0,0)
+    assert_equal "========\n.  1  2 \nA  S    \nB       \n========\n", @g.generate_current_display
+    @g.mark_shot(1,1)
+    assert_equal "========\n.  1  2 \nA  S    \nB     S \n========\n", @g.generate_current_display
+    @g.mark_shot(0,1)
+    assert_equal "========\n.  1  2 \nA  S  S \nB     S \n========\n", @g.generate_current_display
+  end
+
+  def test_board_receives_strikes_that_hit
+    @g.mark_hit(0,0)
+    assert_equal [["H",".",".","."],
+                  [".",".",".","."],
+                  [".",".",".","."],
+                  [".",".",".","."]], @g.current_game_board
+  end
+
 end

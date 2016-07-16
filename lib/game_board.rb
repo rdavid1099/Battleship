@@ -33,12 +33,48 @@ class GameBoard
     end
   end
 
+  def mark_hit(x_coordinate, y_cooridnate)
+    @current_game_board[x_coordinate][y_cooridnate] = 'H'
+  end
+
   def valid_shot?(x_coordinate, y_cooridnate)
     return true unless @current_game_board[x_coordinate][y_cooridnate] == 'S'
   end
 
   def clear_game_board
     create_new_board
+  end
+
+  def generate_current_display
+    generate_border +
+    generate_column_numbers +
+    generate_display_lines +
+    generate_border
+  end
+
+  def generate_border
+    "==" + "="*(size*3) + "\n"
+  end
+
+  def generate_column_numbers
+    column_numbers = ". "
+    counter = 1
+    size.times do
+      column_numbers += " #{counter} "
+      counter += 1
+    end
+    column_numbers + "\n"
+  end
+
+  def generate_display_lines
+    display_line = Array.new
+    size.times { display_line << evaluate_shots_on_line(display_line.length) }
+    display_line.join
+  end
+
+  def evaluate_shots_on_line(line_num)
+    line = @current_game_board[line_num].map { |space| space == "." ? "   " : " #{space} " }
+    "#{(65 + line_num).chr} #{line.join}\n"
   end
 
 end
