@@ -34,11 +34,23 @@ class GameBoard
   end
 
   def mark_hit(x_coordinate, y_cooridnate)
-    @current_game_board[x_coordinate][y_cooridnate] = 'H'
+    if valid_shot?(x_coordinate, y_cooridnate)
+      @current_game_board[x_coordinate][y_cooridnate] = 'H'
+      return [x_coordinate, y_cooridnate]
+    else
+      return "Coordinates already shot"
+    end
   end
 
   def valid_shot?(x_coordinate, y_cooridnate)
-    return true unless @current_game_board[x_coordinate][y_cooridnate] == 'S'
+    unless shot_out_of_bounds?(x_coordinate, y_cooridnate)
+      return true if @current_game_board[x_coordinate][y_cooridnate] == '.'
+    end
+    false
+  end
+
+  def shot_out_of_bounds?(x_coordinate, y_cooridnate)
+    x_coordinate >= size || y_cooridnate >= size
   end
 
   def clear_game_board

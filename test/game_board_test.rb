@@ -102,6 +102,15 @@ class TestGameBoard < Minitest::Test
     assert @g.valid_shot?(1,1)
   end
 
+  def test_board_recognizes_out_of_bound_shots
+    assert_equal false, @g.shot_out_of_bounds?(0,0)
+    assert_equal true, @g.shot_out_of_bounds?(94,35)
+  end
+
+  def test_shot_validity_doesnt_allow_out_of_bound_shots
+    assert_equal false, @g.valid_shot?(92,53)
+  end
+
   def test_board_allows_shot_unless_its_not_valid
     @g.mark_shot(0,0)
     refute @g.valid_shot?(0,0)
@@ -184,4 +193,27 @@ class TestGameBoard < Minitest::Test
                   [".",".",".","."]], @g.current_game_board
   end
 
+  def test_board_receives_shots_and_hits
+    @g.mark_shot(0,0)
+    @g.mark_hit(1,0)
+    @g.mark_hit(2,1)
+    @g.mark_shot(2,2)
+    assert_equal [["S",".",".","."],
+                  ["H",".",".","."],
+                  [".","H","S","."],
+                  [".",".",".","."]], @g.current_game_board
+  end
+
+  def test_strikes_are_invalid_if_hit_marked_on_spot
+    @g.mark_hit(0,0)
+    assert_equal false, @g.valid_shot?(0,0)
+  end
+
+  def test_game_board_displays_hits_and_shots
+    @g.mark_shot(0,0)
+    @g.mark_hit(1,0)
+    @g.mark_hit(2,1)
+    @g.mark_shot(2,2)
+    assert_equal "==============\n.  1  2  3  4 \nA  S          \nB  H          \nC     H  S    \nD             \n==============\n", @g.generate_current_display
+  end
 end
