@@ -1,10 +1,12 @@
 require 'pry'
 
 class GameBoard
-  attr_reader :current_game_board
+  attr_reader :current_game_board,
+              :total_number_of_shots
 
   def initialize(board_size = 4)
     @board_size = board_size
+    @total_number_of_shots = 0
     create_new_board
   end
 
@@ -27,6 +29,7 @@ class GameBoard
   def mark_shot(x_coordinate, y_cooridnate)
     if valid_shot?(x_coordinate, y_cooridnate)
       @current_game_board[x_coordinate][y_cooridnate] = 'S'
+      @total_number_of_shots += 1
       return [x_coordinate, y_cooridnate]
     else
       return "Coordinates already shot"
@@ -36,6 +39,7 @@ class GameBoard
   def mark_hit(x_coordinate, y_cooridnate)
     if valid_shot?(x_coordinate, y_cooridnate)
       @current_game_board[x_coordinate][y_cooridnate] = 'H'
+      @total_number_of_shots += 1
       return [x_coordinate, y_cooridnate]
     else
       return "Coordinates already shot"

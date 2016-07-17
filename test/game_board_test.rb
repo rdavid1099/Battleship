@@ -132,6 +132,14 @@ class TestGameBoard < Minitest::Test
                   [".",".",".","."]], @g.current_game_board
   end
 
+  def test_game_board_counts_total_number_of_shots
+    @g.mark_shot(0,0)
+    @g.mark_shot(1,1)
+    assert_equal 2, @g.total_number_of_shots
+    @g.mark_hit(0,1)
+    assert_equal 3, @g.total_number_of_shots
+  end
+
   def test_game_board_generates_display
     assert_respond_to @g, :generate_current_display
   end
