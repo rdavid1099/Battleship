@@ -1,15 +1,19 @@
 require './lib/game_board'
 require './lib/player'
+require './lib/computer_opponent'
 
 class GameManager
   attr_reader :game_board,
-              :player
+              :player,
+              :computer_opponent
 
   def initialize
     @player = Player.new('TESTING')
     # @player = create_new_player
     @game_board = GameBoard.new
     # @game_board = create_game_board
+    @computer_opponent = ComputerOpponent.new
+    # start_round
   end
 
   def create_new_player
@@ -53,5 +57,19 @@ class GameManager
     return true if answer == 'y' || answer == 'n'
     # puts "You must enter either Y or N."
     return false
+  end
+
+  def start_round
+    puts title_screen
+
+  end
+
+  def title_screen
+    '______  ___ _____ _____ _     _____ _____ _   _ ___________
+  | ___ \/ _ |_   _|_   _| |   |  ___/  ___| | | |_   _| ___ \
+  | |_/ / /_\ \| |   | | | |   | |__ \ `--.| |_| | | | | |_/ /
+  | ___ |  _  || |   | | | |   |  __| `--. |  _  | | | |  __/
+  | |_/ | | | || |   | | | |___| |___/\__/ | | | |_| |_| |
+  \____/\_| |_/\_/   \_/ \_____\____/\____/\_| |_/\___/\_|'
   end
 end

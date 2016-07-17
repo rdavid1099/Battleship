@@ -31,4 +31,21 @@ class TestGameManager < Minitest::Test
     assert_instance_of GameBoard, new_game.game_board
   end
 
+  def test_game_manager_creates_computer_opponent
+    assert_instance_of ComputerOpponent, @game.computer_opponent
+  end
+
+  def test_game_manager_starts_the_round
+    assert_respond_to @game, :start_round
+  end
+
+  def test_game_manager_title_screen_returns_ascii_art
+    assert_equal '______  ___ _____ _____ _     _____ _____ _   _ ___________
+  | ___ \/ _ |_   _|_   _| |   |  ___/  ___| | | |_   _| ___ \
+  | |_/ / /_\ \| |   | | | |   | |__ \ `--.| |_| | | | | |_/ /
+  | ___ |  _  || |   | | | |   |  __| `--. |  _  | | | |  __/
+  | |_/ | | | || |   | | | |___| |___/\__/ | | | |_| |_| |
+  \____/\_| |_/\_/   \_/ \_____\____/\____/\_| |_/\___/\_|', @game.title_screen
+  end
+
 end
