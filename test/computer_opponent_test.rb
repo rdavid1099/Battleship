@@ -75,7 +75,8 @@ class TestComputerOpponent < Minitest::Test
     assert_equal nil, @compy.ships[1].placement
     @compy.generate_ship_locations
     assert_equal 2, @compy.ships[0].placement.length
-    assert_equal 3, @compy.ships[1].placement.length    
+    assert_equal 3, @compy.ships[1].placement.length
+    assert_equal 5, @compy.all_ship_placements.length  
   end
 
 end

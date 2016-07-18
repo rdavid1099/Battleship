@@ -43,15 +43,16 @@ class TestPlayer < Minitest::Test
   end
 
   def test_format_strike_can_handle_different_forms_of_input
-    assert_equal [0,0], @p.format_input("0,0")
-    assert_equal [0,0], @p.format_input("a,0")
-    assert_equal [1,0], @p.format_input("0,b")
-    assert_equal [2,0], @p.format_input("c,0")
-    assert_equal [0,0], @p.format_input("a0")
+    assert_equal [0,0], @p.format_input("1,1")
+    assert_equal [0,0], @p.format_input("a,1")
+    assert_equal [1,0], @p.format_input("1,b")
+    assert_equal [2,0], @p.format_input("c,1")
+    assert_equal [0,0], @p.format_input("a1")
   end
 
   def test_player_input_is_validated
-    assert_equal true, @p.valid_coordinates?(["a","0"])
+    assert_equal true, @p.valid_coordinates?(["a","1"])
+    assert_equal false, @p.valid_coordinates?(["a","0"])
     assert_equal false, @p.valid_coordinates?(["a","a"])
   end
 

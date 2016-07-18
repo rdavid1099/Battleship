@@ -1,9 +1,11 @@
 require './lib/player'
 
 class ComputerOpponent < Player
-  attr_reader :game_board,
-              :ships
-  attr_accessor :current_ship
+  attr_reader   :ships,
+                :all_ship_placements
+                
+  attr_accessor :current_ship,
+                :game_board
 
   def initialize(game_board = GameBoard.new)
     @game_board = game_board
@@ -55,25 +57,4 @@ class ComputerOpponent < Player
       return available_coordinates[computer_choice] if computer_choice < available_coordinates.length
     end
   end
-
-  # def coordinates_clear?(coordinates)
-  #   return true if @all_ship_placements.empty?
-  #   @all_ship_placements.none? { |prev_coordinate| prev_coordinate == coordinates}
-  # end
-  #
-  # def surroundings_are_clear(coordinates)
-  #   all_clear(coordinates, "right") || all_clear(coordinates, "left") || all_clear(coordinates, "up") || all_clear(coordinates, "down")
-  # end
-  #
-  # def all_clear(anchor_point, direction)
-  #   y_coord = anchor_point[0]
-  #   x_coord = anchor_point[1]
-  #   @placements = []
-  #   (current_ship.size - 1).times { @placements << [(y_coord -= 1), x_coord] } if direction == "up"
-  #   (current_ship.size - 1).times { @placements << [(y_coord += 1), x_coord] } if direction == "down"
-  #   (current_ship.size - 1).times { @placements << [y_coord, (x_coord -= 1)] } if direction == "left"
-  #   (current_ship.size - 1).times { @placements << [y_coord, (x_coord += 1)] } if direction == "right"
-  #   @placements.all? { |coordinate| coordinates_clear?(coordinate) && game_board.shot_out_of_bounds?(coordinate[0],coordinate[1]) == false }
-  # end
-
 end

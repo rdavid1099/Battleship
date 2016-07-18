@@ -2,7 +2,9 @@ require './lib/ship'
 
 class Player
   attr_reader   :name,
-                :ships
+                :ships,
+                :all_ship_placements
+
   attr_accessor :game_board,
                 :current_ship
 
@@ -38,9 +40,9 @@ class Player
 
   def user_chooses_ship_placement(available_coordinates)
     loop do
-      # print remaining_placement_menu(available_coordinates)
-      # user_choice = gets.chomp.to_i
-      user_choice = 2
+      print remaining_placement_menu(available_coordinates)
+      user_choice = gets.chomp.to_i
+      # user_choice = 2
       return available_coordinates[user_choice - 1] unless user_choice <= 0 || user_choice > available_coordinates.length
       puts "You must enter a selection between 1 and #{available_coordinates.length}."
     end
@@ -68,7 +70,7 @@ class Player
 
   def get_first_placement
     loop do
-      # print "Enter the coordinates of where you would like to place this #{ships[-1].size} unit ship.\n> "
+      print "Please enter the coordinates of where you would like to place this #{current_ship.size} unit ship.\n> "
       placement_coordinates = input
       if coordinates_clear?(placement_coordinates) && surroundings_are_clear(placement_coordinates)
         return placement_coordinates
@@ -79,7 +81,7 @@ class Player
   end
 
   def remaining_placement_menu(placement_options)
-    menu = "Please select the placement you would like for this 2 unit ship\n"
+    menu = "Please select the placement you would like for this #{current_ship.size} unit ship\n"
     placement_options.each.with_index do |coordinates, index|
       menu += "#{index + 1})#{convert_cordinate_to_text(coordinates)}\n"
     end
@@ -112,8 +114,8 @@ class Player
     player_input = String.new
     loop do
       @coordinates_valid = true
-      # player_input = gets.chomp.downcase
-      player_input = "a,0"
+      player_input = gets.chomp.downcase
+      # player_input = "a,1"
       player_input = format_input(player_input)
       break if game_board.valid_shot?(player_input[0],player_input[1])
       error_message(player_input)
@@ -125,8 +127,8 @@ class Player
     player_coordinates = converted_input(player_input.chars)
     return [99,99] if player_coordinates == nil
     player_coordinates.map do |char|
-      char = char.ord - 97 if char =~ /[a-z]/
-      char.to_i
+      char = char.ord - 96 if char =~ /[a-z]/
+      char.to_i - 1
     end
   end
 
@@ -152,17 +154,19 @@ class Player
   end
 
   def valid_coordinates?(input)
-    !input.all? { |char| char =~ /[a-z]/ }
+    return false if input.all? { |char| char =~ /[a-z]/ }
+    return false if input.any? { |char| char =~ /0/ }
+    true
   end
 
   def coordinates_not_valid
     @coordinates_valid = false
-    puts "You must enter valid coordinates i.e.: 'A,0'."
+    print "You must enter valid coordinates i.e.: 'A,1'.\n> "
   end
 
   def error_message(bad_coordinates)
     if game_board.shot_out_of_bounds?(bad_coordinates[0],bad_coordinates[1]) && @coordinates_valid
-      puts "You must enter valid coordinates within the #{game_board.size}x#{game_board.size} game board."
+      print "You must enter valid coordinates within the #{game_board.size}x#{game_board.size} game board.\n> "
     elsif @coordinates_valid == false
       return nil
     else
