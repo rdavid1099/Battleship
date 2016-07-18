@@ -1,6 +1,7 @@
 class Ship
   attr_reader :size,
-              :current_state
+              :current_state,
+              :placement
 
   def initialize(size = 2)
     @size = size
@@ -27,6 +28,10 @@ class Ship
 
   def shot_hits_ship?(location)
     location < size && @current_state[location] != 'X'
+  end
+
+  def place_on_game_board(placement)
+    @placement = placement
   end
 
   def status

@@ -134,4 +134,14 @@ class TestShip < Minitest::Test
     assert_equal "<=O=X=O=X=>: Remaining Health [**********          ] 50%", ship_2.status
     assert_equal "<=O=O=>: Remaining Health [********************] 100%", @s.status
   end
+
+  def test_ships_can_be_placed_on_a_game_board
+    assert_respond_to @s, :place_on_game_board
+  end
+
+  def test_ship_knows_where_it_is_placed
+    @s.place_on_game_board([[0,0],[0,1]])
+    assert_equal [[0,0],[0,1]], @s.placement
+  end
+
 end

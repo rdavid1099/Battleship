@@ -54,6 +54,7 @@ class GameBoard
   end
 
   def shot_out_of_bounds?(x_coordinate, y_cooridnate)
+    return true if x_coordinate < 0 || y_cooridnate < 0
     x_coordinate >= size || y_cooridnate >= size
   end
 
