@@ -110,4 +110,28 @@ class TestShip < Minitest::Test
     @s.shot(1)
     assert_equal "[xX UNDER THE SEA! Xx]", @s.health_bar
   end
+
+  def test_ships_display_visual_status
+    assert_equal "<=O=O=>", @s.visual_ship
+    @s.shot(1)
+    assert_equal "<=O=X=>", @s.visual_ship
+    @s.shot(0)
+    assert_equal "<=X=X=>", @s.visual_ship
+  end
+
+  def test_ship_display_changes_depending_on_size_of_ship
+    ship = Ship.new(5)
+    assert_equal "<=O=O=O=O=O=>", ship.visual_ship
+  end
+
+  def test_ships_display_complete_status
+    ship_1 = Ship.new(3)
+    ship_2 = Ship.new(4)
+    ship_1.shot(2)
+    ship_2.shot(1)
+    ship_2.shot(3)
+    assert_equal "<=O=O=X=>: Remaining Health [*************       ] 67%", ship_1.status
+    assert_equal "<=O=X=O=X=>: Remaining Health [**********          ] 50%", ship_2.status
+    assert_equal "<=O=O=>: Remaining Health [********************] 100%", @s.status
+  end
 end

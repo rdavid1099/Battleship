@@ -29,6 +29,10 @@ class Ship
     location < size && @current_state[location] != 'X'
   end
 
+  def status
+    "#{visual_ship}: Remaining Health #{health_bar} #{health_left_percentage}%"
+  end
+
   def health_left_percentage
     ((remaining_health / size.to_f) * 100).round
   end
@@ -42,5 +46,11 @@ class Ship
     health_bar_length = health_left_percentage/5
     empty_space = 20 - health_bar_length
     "[" + "*"*health_bar_length + " "*empty_space + "]"
+  end
+
+  def visual_ship
+    ship_display = ["<="]
+    @current_state.each { |damage| ship_display << "#{damage}=" }
+    ship_display.join + ">"
   end
 end
