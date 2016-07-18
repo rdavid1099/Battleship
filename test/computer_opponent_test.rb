@@ -1,10 +1,12 @@
 require './test/test_helper'
 require './lib/computer_opponent'
 require './lib/game_board'
+require './lib/ship'
 
 class TestComputerOpponent < Minitest::Test
   def setup
-    @compy = ComputerOpponent.new(4)
+    @compy = ComputerOpponent.new(GameBoard.new)
+    @compy.add_ship(Ship.new)
   end
 
   def test_a_computer_opponent_can_be_initialized
@@ -12,7 +14,7 @@ class TestComputerOpponent < Minitest::Test
   end
 
   def test_computer_opponent_is_initialized_knowing_the_size_of_the_board
-    assert_equal 4, @compy.board_size
+    assert_equal 4, @compy.game_board.size
   end
 
   def test_computer_generates_strike_positions
@@ -25,22 +27,55 @@ class TestComputerOpponent < Minitest::Test
   end
 
   def test_computer_strikes_are_registered_by_the_game_board
+    skip
     board = GameBoard.new(4)
     strike_1 = @compy.generate_strike
     assert_equal true, board.valid_shot?(strike_1[0], strike_1[1])
     board.mark_shot(strike_1[0], strike_1[1])
     strike_2 = @compy.generate_strike
-    assert_equal true, board.valid_shot?(strike_2[0], strike_2[1])
     board.mark_shot(strike_2[0], strike_2[1])
     assert_equal 2, board.total_number_of_shots
   end
 
   def test_computer_keeps_generating_targets_until_it_lands_a_valid_shot
-    board = GameBoard.new(2)
-    board.mark_shot(0,0)
-    board.mark_shot(0,1)
-    board.mark_shot(1,1)
-    assert_equal [1,0], @compy.computers_turn(board)
+    @compy.game_board.mark_shot(0,0)
+    @compy.game_board.mark_shot(0,1)
+    @compy.game_board.mark_shot(0,2)
+    @compy.game_board.mark_shot(0,3)
+    computer_strike = @compy.computers_turn
+    assert_equal true, computer_strike[0] != 0
+  end
+
+  def test_ships_can_be_added_to_computers_fleet
+    @compy.add_ship(Ship.new)
+    assert_equal 2, @compy.ships.length
+  end
+
+  def test_computer_randomly_generates_ship_anchor_point
+    @compy.current_ship = Ship.new
+    assert_equal 2, @compy.get_first_placement.length
+  end
+
+  def test_computer_randomly_generates_rest_of_ship_placement
+    skip
+    @compy.current_ship = Ship.new
+    next_placement_options = [[[1,0]],[[0,1]]]
+    assert_equal [[1,0]], @compy.computer_chooses_ship_placement(next_placement_options)
+  end
+
+  def test_computer_generates_complete_ship_placement
+    assert_equal nil, @compy.ships[0].placement
+    @compy.generate_ship_locations
+    assert_equal 2, @compy.ships[0].placement.length
+  end
+
+  def test_computer_can_place_two_ships
+    @compy.add_ship(Ship.new(3))
+    assert_equal nil, @compy.ships[0].placement
+    assert_equal nil, @compy.ships[1].placement
+    @compy.generate_ship_locations
+    assert_equal 2, @compy.ships[0].placement.length
+    assert_equal 3, @compy.ships[1].placement.length    
   end
 
 end
