@@ -1,7 +1,7 @@
 class ComputerOpponent
   attr_reader :board_size
 
-  def initialize(board_size)
+  def initialize(board_size = 4)
     @board_size = board_size
   end
 

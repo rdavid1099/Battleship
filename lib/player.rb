@@ -1,4 +1,5 @@
 require './lib/ship'
+
 class Player
   attr_reader   :name,
                 :ships
@@ -15,18 +16,34 @@ class Player
     @ships << ship
   end
 
+  def update_all_ship_placements(ship_coordinates)
+    ship_coordinates.each { |coordinate| @all_ship_placements << coordinate }
+  end
+
   def place_ship_on_board
     @ships.each do |ship|
       @current_ship = ship
       ship_coordinates = [get_first_placement]
-      ship_coordinates << get_next_placement(ship_coordinates[0])
-      ship.placement(ship_coordinates)
+      remaining_coordinates = get_next_placement(ship_coordinates[0])
+      remaining_coordinates.each { |coordinate| ship_coordinates << coordinate }
+      update_all_ship_placements(ship_coordinates)
+      ship.place_on_game_board(ship_coordinates)
     end
   end
 
   def get_next_placement(prev_placement)
     next_placement_options = generate_next_valid_coordinates_for_ship_placement(prev_placement)
-    print remaining_placement_menu(next_placement_options)
+    return user_chooses_ship_placement(next_placement_options)
+  end
+
+  def user_chooses_ship_placement(available_coordinates)
+    loop do
+      # print remaining_placement_menu(available_coordinates)
+      # user_choice = gets.chomp.to_i
+      user_choice = 2
+      return available_coordinates[user_choice - 1] unless user_choice <= 0 || user_choice > available_coordinates.length
+      puts "You must enter a selection between 1 and #{available_coordinates.length}."
+    end
   end
 
   def generate_next_valid_coordinates_for_ship_placement(anchor_point)
@@ -39,22 +56,22 @@ class Player
   end
 
   def all_clear(anchor_point, direction)
-    x_coordinate = anchor_point[0]
-    y_cooridnate = anchor_point[1]
+    y_coord = anchor_point[0]
+    x_coord = anchor_point[1]
     @placements = []
-    (current_ship.size - 1).times { @placements << [(x_coordinate -= 1), y_cooridnate] } if direction == "up"
-    (current_ship.size - 1).times { @placements << [(x_coordinate += 1), y_cooridnate] } if direction == "down"
-    (current_ship.size - 1).times { @placements << [x_coordinate, (y_cooridnate -= 1)] } if direction == "left"
-    (current_ship.size - 1).times { @placements << [x_coordinate, (y_cooridnate += 1)] } if direction == "right"
+    (current_ship.size - 1).times { @placements << [(y_coord -= 1), x_coord] } if direction == "up"
+    (current_ship.size - 1).times { @placements << [(y_coord += 1), x_coord] } if direction == "down"
+    (current_ship.size - 1).times { @placements << [y_coord, (x_coord -= 1)] } if direction == "left"
+    (current_ship.size - 1).times { @placements << [y_coord, (x_coord += 1)] } if direction == "right"
     @placements.all? { |coordinate| coordinates_clear?(coordinate) && game_board.shot_out_of_bounds?(coordinate[0],coordinate[1]) == false }
   end
 
   def get_first_placement
     loop do
-      print "Enter the coordinates of where you would like to place this #{ships[-1].size} unit ship.\n> "
-      placement_coodinates = input
-      if coordinates_clear?(placement_coodinates)
-        return placement_coodinates
+      # print "Enter the coordinates of where you would like to place this #{ships[-1].size} unit ship.\n> "
+      placement_coordinates = input
+      if coordinates_clear?(placement_coordinates) && surroundings_are_clear(placement_coordinates)
+        return placement_coordinates
       else
         puts "One of your ships is already occupying that spot."
       end
@@ -72,14 +89,18 @@ class Player
   def convert_cordinate_to_text(coordinates)
     converted_to_text = " "
     coordinates.each do |coordinate|
-      converted_to_text += "#{(coordinate[0] + 65).chr},#{(coordinate[1] + 1)} "
+      converted_to_text += " #{(coordinate[0] + 65).chr},#{(coordinate[1] + 1)} "
     end
     converted_to_text
   end
 
-  def coordinates_clear?(coodinates)
+  def coordinates_clear?(coordinates)
     return true if @all_ship_placements.empty?
-    @all_ship_placements.none? { |prev_coordinate| prev_coordinate == coodinates}
+    @all_ship_placements.none? { |prev_coordinate| prev_coordinate == coordinates}
+  end
+
+  def surroundings_are_clear(coordinates)
+    all_clear(coordinates, "right") || all_clear(coordinates, "left") || all_clear(coordinates, "up") || all_clear(coordinates, "down")
   end
 
   def input_strike

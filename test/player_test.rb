@@ -99,21 +99,46 @@ class TestPlayer < Minitest::Test
 
   def test_converting_array_to_english_string_of_coordinates
     coordinate = [[1,0]]
-    assert_equal " B,1 ", @p.convert_cordinate_to_text(coordinate)
+    assert_equal "  B,1 ", @p.convert_cordinate_to_text(coordinate)
   end
 
   def test_menu_generated_of_remaining_placements
     coordinate = [0,0]
     @p.current_ship = Ship.new
     next_placement_options = [[[1,0]],[[0,1]]]
-    assert_equal "Please select the placement you would like for this 2 unit ship\n1) B,1 \n2) A,2 \n> ", @p.remaining_placement_menu(next_placement_options)
+    assert_equal "Please select the placement you would like for this 2 unit ship\n1)  B,1 \n2)  A,2 \n> ", @p.remaining_placement_menu(next_placement_options)
   end
 
-  # def test_player_can_place_ships
-  #   ship = Ship.new
-  #   @p.place_ship_on_board(ship)
-  #   assert_equal [[0,0],[0,1]], @p.ships[0].placement
-  # end
+  def test_menu_generates_for_ship_with_more_options
+    anchor_point = [1,1]
+    @p.current_ship = Ship.new
+    next_placement_options = [[[0, 1]],[[2, 1]],[[1,0]],[[1,2]]]
+    assert_equal "Please select the placement you would like for this 2 unit ship\n1)  A,2 \n2)  C,2 \n3)  B,1 \n4)  B,3 \n> ", @p.remaining_placement_menu(next_placement_options)
+  end
 
+  def test_menu_generates_for_larger_ships
+    @p.current_ship = Ship.new(4)
+    anchor_point = [0,0]
+    next_placement_options = [[[1, 0],[2, 0],[3, 0]],[[0, 1],[0, 2],[0, 3]]]
+    assert_equal "Please select the placement you would like for this 2 unit ship\n1)  B,1  C,1  D,1 \n2)  A,2  A,3  A,4 \n> ", @p.remaining_placement_menu(next_placement_options)
+  end
+
+  def test_player_can_place_ships
+    @p.place_ship_on_board
+    assert_equal [[0,0],[0,1]], @p.ships[0].placement
+  end
+
+  def test_player_cannot_place_ship_in_crowded_surroundings
+    @p.current_ship = Ship.new
+    assert_equal true, @p.surroundings_are_clear([0,0])
+    @p.update_all_ship_placements([[0,1],[1,0]])
+    assert_equal false, @p.surroundings_are_clear([0,0])
+  end
+
+  def test_player_can_place_two_ships
+    @p.update_all_ship_placements([[2,0],[2,1],[2,2][2,3]])
+    @p.place_ship_on_board
+    assert_equal [[0,0],[0,1]], @p.ships[0].placement
+  end
 
 end
