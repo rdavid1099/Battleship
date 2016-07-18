@@ -7,6 +7,7 @@ class TestPlayer < Minitest::Test
   def setup
     @p = Player.new('Test')
     @p.game_board = GameBoard.new(4)
+    @p.add_ship(Ship.new)
   end
 
   def test_player_can_be_created_with_name
@@ -70,6 +71,7 @@ class TestPlayer < Minitest::Test
 
   def test_program_automatically_generates_all_open_spaces
     coordinate = [0,0]
+    @p.current_ship = Ship.new
     assert_equal true, @p.all_clear(coordinate,"down")
     assert_equal false, @p.all_clear(coordinate,"up")
     assert_equal false, @p.all_clear(coordinate,"left")
@@ -78,13 +80,40 @@ class TestPlayer < Minitest::Test
 
   def test_valid_coordinates_are_generated_from_anchor_point
     coordinate = [0,0]
+    @p.current_ship = Ship.new
     assert_equal [[[1,0]],[[0,1]]], @p.generate_next_valid_coordinates_for_ship_placement(coordinate)
   end
 
-  def test_player_can_place_ships
-    ship = Ship.new
-    @p.place_ship_on_board(ship)
-    assert_equal [[0,0],[0,1]], @p.ships[0].placement
+  def test_valid_coordinates_generated_from_different_anchor_point
+    anchor_point = [1,1]
+    @p.current_ship = Ship.new
+    assert_equal [[[0, 1]],[[2, 1]],[[1,0]],[[1,2]]], @p.generate_next_valid_coordinates_for_ship_placement(anchor_point)
+
   end
+
+  def test_valid_coordinates_are_generated_for_larger_ships
+    @p.current_ship = Ship.new(4)
+    anchor_point = [0,0]
+    assert_equal [[[1, 0],[2, 0],[3, 0]],[[0, 1],[0, 2],[0, 3]]], @p.generate_next_valid_coordinates_for_ship_placement(anchor_point)
+  end
+
+  def test_converting_array_to_english_string_of_coordinates
+    coordinate = [[1,0]]
+    assert_equal " B,1 ", @p.convert_cordinate_to_text(coordinate)
+  end
+
+  def test_menu_generated_of_remaining_placements
+    coordinate = [0,0]
+    @p.current_ship = Ship.new
+    next_placement_options = [[[1,0]],[[0,1]]]
+    assert_equal "Please select the placement you would like for this 2 unit ship\n1) B,1 \n2) A,2 \n> ", @p.remaining_placement_menu(next_placement_options)
+  end
+
+  # def test_player_can_place_ships
+  #   ship = Ship.new
+  #   @p.place_ship_on_board(ship)
+  #   assert_equal [[0,0],[0,1]], @p.ships[0].placement
+  # end
+
 
 end

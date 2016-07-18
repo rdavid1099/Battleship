@@ -2,25 +2,31 @@ require './lib/ship'
 class Player
   attr_reader   :name,
                 :ships
-  attr_accessor :game_board
+  attr_accessor :game_board,
+                :current_ship
 
   def initialize(name)
     @name = name
     @ships = Array.new
-    @ships = [Ship.new]
     @all_ship_placements = Array.new
   end
 
-  def place_ship_on_board(ship)
+  def add_ship(ship)
     @ships << ship
-    ship_coordinates = [get_first_placement]
-    (ship.size - 1).times { ship_coordinates << get_next_placement(placement[-1]) }
-    ship.placement(ship_coordinates)
+  end
+
+  def place_ship_on_board
+    @ships.each do |ship|
+      @current_ship = ship
+      ship_coordinates = [get_first_placement]
+      ship_coordinates << get_next_placement(ship_coordinates[0])
+      ship.placement(ship_coordinates)
+    end
   end
 
   def get_next_placement(prev_placement)
     next_placement_options = generate_next_valid_coordinates_for_ship_placement(prev_placement)
-    
+    print remaining_placement_menu(next_placement_options)
   end
 
   def generate_next_valid_coordinates_for_ship_placement(anchor_point)
@@ -36,10 +42,10 @@ class Player
     x_coordinate = anchor_point[0]
     y_cooridnate = anchor_point[1]
     @placements = []
-    (@ships[-1].size - 1).times { @placements << [(x_coordinate -= 1), y_cooridnate] } if direction == "up"
-    (@ships[-1].size - 1).times { @placements << [(x_coordinate += 1), y_cooridnate] } if direction == "down"
-    (@ships[-1].size - 1).times { @placements << [x_coordinate, (y_cooridnate -= 1)] } if direction == "left"
-    (@ships[-1].size - 1).times { @placements << [x_coordinate, (y_cooridnate += 1)] } if direction == "right"
+    (current_ship.size - 1).times { @placements << [(x_coordinate -= 1), y_cooridnate] } if direction == "up"
+    (current_ship.size - 1).times { @placements << [(x_coordinate += 1), y_cooridnate] } if direction == "down"
+    (current_ship.size - 1).times { @placements << [x_coordinate, (y_cooridnate -= 1)] } if direction == "left"
+    (current_ship.size - 1).times { @placements << [x_coordinate, (y_cooridnate += 1)] } if direction == "right"
     @placements.all? { |coordinate| coordinates_clear?(coordinate) && game_board.shot_out_of_bounds?(coordinate[0],coordinate[1]) == false }
   end
 
@@ -53,6 +59,22 @@ class Player
         puts "One of your ships is already occupying that spot."
       end
     end
+  end
+
+  def remaining_placement_menu(placement_options)
+    menu = "Please select the placement you would like for this 2 unit ship\n"
+    placement_options.each.with_index do |coordinates, index|
+      menu += "#{index + 1})#{convert_cordinate_to_text(coordinates)}\n"
+    end
+    menu += "> "
+  end
+
+  def convert_cordinate_to_text(coordinates)
+    converted_to_text = " "
+    coordinates.each do |coordinate|
+      converted_to_text += "#{(coordinate[0] + 65).chr},#{(coordinate[1] + 1)} "
+    end
+    converted_to_text
   end
 
   def coordinates_clear?(coodinates)
