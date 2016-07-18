@@ -28,17 +28,31 @@ class TestPlayer < Minitest::Test
     assert_equal [0,0], @p.format_strike_input("00")
   end
 
+  def test_input_removes_special_characters
+    assert_equal ["a","0"], @p.converted_input("a,0".chars)
+    assert_equal ["b","1"], @p.converted_input("b,,.';1'".chars)
+  end
+
   def test_format_strike_can_handle_different_forms_of_input
     assert_equal [0,0], @p.format_strike_input("0,0")
     assert_equal [0,0], @p.format_strike_input("a,0")
     assert_equal [1,0], @p.format_strike_input("0,b")
-    assert_equal [0,0], @p.format_strike_input("A,0")
-    assert_equal [0,0], @p.format_strike_input("A0")
+    assert_equal [2,0], @p.format_strike_input("c,0")
+    assert_equal [0,0], @p.format_strike_input("a0")
   end
 
-  # def test_player_can_input_strike
-  #   assert_respond_to @p, :input_strike
-  #   assert_equal [0,0], @p.input_strike
-  # end
+  def test_player_input_is_validated
+    assert_equal true, @p.valid_coordinates?(["a","0"])
+    assert_equal false, @p.valid_coordinates?(["a","a"])
+  end
+
+  def test_player_gets_message_for_invalid_coordinates
+    assert_respond_to @p, :coordinates_not_valid
+  end
+
+  def test_player_can_input_strike
+    assert_respond_to @p, :input_strike
+    assert_equal [0,0], @p.input_strike
+  end
 
 end
