@@ -69,7 +69,7 @@ class TestGameBoard < Minitest::Test
 
   def test_board_marks_shots_fired
     @g.mark_shot(0,0)
-    assert_equal [["S",".",".","."],
+    assert_equal [["M",".",".","."],
                   [".",".",".","."],
                   [".",".",".","."],
                   [".",".",".","."]], @g.current_game_board
@@ -78,8 +78,8 @@ class TestGameBoard < Minitest::Test
   def test_board_marks_two_shots
     @g.mark_shot(0,0)
     @g.mark_shot(1,2)
-    assert_equal [["S",".",".","."],
-                  [".",".","S","."],
+    assert_equal [["M",".",".","."],
+                  [".",".","M","."],
                   [".",".",".","."],
                   [".",".",".","."]], @g.current_game_board
   end
@@ -90,10 +90,10 @@ class TestGameBoard < Minitest::Test
     @g.mark_shot(3,2)
     @g.mark_shot(0,1)
     @g.mark_shot(1,2)
-    assert_equal [[".","S","S","."],
-                  [".",".","S","S"],
+    assert_equal [[".","M","M","."],
+                  [".",".","M","M"],
                   [".",".",".","."],
-                  [".",".","S","."]], @g.current_game_board
+                  [".",".","M","."]], @g.current_game_board
   end
 
   def test_board_determines_if_shot_is_valid
@@ -136,8 +136,6 @@ class TestGameBoard < Minitest::Test
     @g.mark_shot(0,0)
     @g.mark_shot(1,1)
     assert_equal 2, @g.total_number_of_shots
-    @g.mark_hit(0,1)
-    assert_equal 3, @g.total_number_of_shots
   end
 
   def test_game_board_generates_display
@@ -180,17 +178,17 @@ class TestGameBoard < Minitest::Test
   def test_board_evaluates_shots_on_given_display_line
     @g.create_new_board(2)
     @g.mark_shot(0,0)
-    assert_equal "A  S    \n", @g.evaluate_shots_on_line(0)
+    assert_equal "A  M    \n", @g.evaluate_shots_on_line(0)
   end
 
   def test_game_board_display_lines_update_after_shot_fired
     @g.create_new_board(2)
     @g.mark_shot(0,0)
-    assert_equal "========\n.  1  2 \nA  S    \nB       \n========\n", @g.generate_current_display
+    assert_equal "========\n.  1  2 \nA  M    \nB       \n========\n", @g.generate_current_display
     @g.mark_shot(1,1)
-    assert_equal "========\n.  1  2 \nA  S    \nB     S \n========\n", @g.generate_current_display
+    assert_equal "========\n.  1  2 \nA  M    \nB     M \n========\n", @g.generate_current_display
     @g.mark_shot(0,1)
-    assert_equal "========\n.  1  2 \nA  S  S \nB     S \n========\n", @g.generate_current_display
+    assert_equal "========\n.  1  2 \nA  M  M \nB     M \n========\n", @g.generate_current_display
   end
 
   def test_board_receives_strikes_that_hit
@@ -206,9 +204,9 @@ class TestGameBoard < Minitest::Test
     @g.mark_hit(1,0)
     @g.mark_hit(2,1)
     @g.mark_shot(2,2)
-    assert_equal [["S",".",".","."],
+    assert_equal [["M",".",".","."],
                   ["H",".",".","."],
-                  [".","H","S","."],
+                  [".","H","M","."],
                   [".",".",".","."]], @g.current_game_board
   end
 
@@ -218,10 +216,11 @@ class TestGameBoard < Minitest::Test
   end
 
   def test_game_board_displays_hits_and_shots
+    @g.mark_ship_location([[1,0],[1,1],[1,2]])
     @g.mark_shot(0,0)
     @g.mark_hit(1,0)
-    @g.mark_hit(2,1)
+    @g.mark_hit(1,1)
     @g.mark_shot(2,2)
-    assert_equal "==============\n.  1  2  3  4 \nA  S          \nB  H          \nC     H  S    \nD             \n==============\n", @g.generate_current_display
+    assert_equal "==============\n.  1  2  3  4 \nA  M          \nB  H  H  O    \nC        M    \nD             \n==============\n", @g.generate_current_display
   end
 end

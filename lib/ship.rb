@@ -35,7 +35,7 @@ class Ship
   end
 
   def status
-    "#{visual_ship}: Remaining Health #{health_bar} #{health_left_percentage}%"
+    "#{visual_ship}: Remaining Health #{health_bar} #{health_left_percentage}%".rjust(59)
   end
 
   def health_left_percentage

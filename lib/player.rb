@@ -19,6 +19,7 @@ class Player
   end
 
   def update_all_ship_placements(ship_coordinates)
+    game_board.mark_ship_location(ship_coordinates)
     ship_coordinates.each { |coordinate| @all_ship_placements << coordinate }
   end
 
@@ -70,7 +71,7 @@ class Player
 
   def get_first_placement
     loop do
-      print "Please enter the coordinates of where you would like to place this #{current_ship.size} unit ship.\n> "
+      print "Please enter the coordinates of where you would like to place your #{current_ship.size} unit ship.\n> "
       placement_coordinates = input
       if coordinates_clear?(placement_coordinates) && surroundings_are_clear(placement_coordinates)
         return placement_coordinates
@@ -172,6 +173,12 @@ class Player
     else
       puts game_board.mark_shot(bad_coordinates[0],bad_coordinates[1])
     end
+  end
+
+  def reset
+    @ships = []
+    @all_ship_placements = []
+    game_board.clear_game_board
   end
 
 end

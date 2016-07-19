@@ -1,12 +1,12 @@
-require 'pry'
-
 class GameBoard
   attr_reader :current_game_board,
-              :total_number_of_shots
+              :total_number_of_shots,
+              :total_number_of_hits
 
   def initialize(board_size = 4)
     @board_size = board_size
     @total_number_of_shots = 0
+    @total_number_of_hits = 0
     create_new_board
   end
 
@@ -26,9 +26,19 @@ class GameBoard
     current_game_board.length
   end
 
+  def mark_ship_location(ship_coordinates)
+    ship_coordinates.each do |coordinate|
+      @current_game_board[coordinate[0]][coordinate[1]] = 'O'
+    end
+  end
+
   def mark_shot(y_cooridnate, x_cooridnate)
     if valid_shot?(y_cooridnate, x_cooridnate)
-      @current_game_board[y_cooridnate][x_cooridnate] = 'S'
+      unless @current_game_board[y_cooridnate][x_cooridnate] == 'O'
+        @current_game_board[y_cooridnate][x_cooridnate] = 'M'
+      else
+        mark_hit(y_cooridnate, x_cooridnate)
+      end
       @total_number_of_shots += 1
       return [y_cooridnate, x_cooridnate]
     else
@@ -37,18 +47,13 @@ class GameBoard
   end
 
   def mark_hit(y_coordinate, x_cooridnate)
-    if valid_shot?(y_coordinate, x_cooridnate)
-      @current_game_board[y_coordinate][x_cooridnate] = 'H'
-      @total_number_of_shots += 1
-      return [y_coordinate, x_cooridnate]
-    else
-      return "Coordinates already shot"
-    end
+    @current_game_board[y_coordinate][x_cooridnate] = 'H'
+    @total_number_of_hits += 1
   end
 
   def valid_shot?(y_coordinate, x_cooridnate)
     unless shot_out_of_bounds?(y_coordinate, x_cooridnate)
-      return true if @current_game_board[y_coordinate][x_cooridnate] == '.'
+      return true if @current_game_board[y_coordinate][x_cooridnate] == '.' || @current_game_board[y_coordinate][x_cooridnate] == 'O'
     end
     false
   end

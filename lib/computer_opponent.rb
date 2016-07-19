@@ -3,7 +3,7 @@ require './lib/player'
 class ComputerOpponent < Player
   attr_reader   :ships,
                 :all_ship_placements
-                
+
   attr_accessor :current_ship,
                 :game_board
 
@@ -26,6 +26,11 @@ class ComputerOpponent < Player
 
   def add_ship(ship)
     @ships << ship
+  end
+
+  def update_all_ship_placements(ship_coordinates)
+    game_board.mark_ship_location(ship_coordinates)
+    ship_coordinates.each { |coordinate| @all_ship_placements << coordinate }
   end
 
   def generate_ship_locations
@@ -57,4 +62,11 @@ class ComputerOpponent < Player
       return available_coordinates[computer_choice] if computer_choice < available_coordinates.length
     end
   end
+
+  def reset
+    @ships = []
+    @all_ship_placements = []
+    game_board.clear_game_board
+  end
+
 end

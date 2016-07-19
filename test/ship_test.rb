@@ -130,9 +130,9 @@ class TestShip < Minitest::Test
     ship_1.shot(2)
     ship_2.shot(1)
     ship_2.shot(3)
-    assert_equal "<=O=O=X=>: Remaining Health [*************       ] 67%", ship_1.status
-    assert_equal "<=O=X=O=X=>: Remaining Health [**********          ] 50%", ship_2.status
-    assert_equal "<=O=O=>: Remaining Health [********************] 100%", @s.status
+    assert_equal "     <=O=O=X=>: Remaining Health [*************       ] 67%", ship_1.status
+    assert_equal "   <=O=X=O=X=>: Remaining Health [**********          ] 50%", ship_2.status
+    assert_equal "      <=O=O=>: Remaining Health [********************] 100%", @s.status
   end
 
   def test_ships_can_be_placed_on_a_game_board
