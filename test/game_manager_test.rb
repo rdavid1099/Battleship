@@ -95,5 +95,4 @@ class TestGameManager < Minitest::Test
     refute @game.game_stats
   end
 
-  
 end

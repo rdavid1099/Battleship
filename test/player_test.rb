@@ -60,7 +60,7 @@ class TestPlayer < Minitest::Test
     assert_respond_to @p, :coordinates_not_valid
   end
 
-  def test_player_can_input_strike
+  def test_player_can_input_coordinates
     @p.game_board.mark_shot(0,1)
     assert_respond_to @p, :input
     assert_equal [0,0], @p.input
@@ -140,6 +140,13 @@ class TestPlayer < Minitest::Test
     @p.update_all_ship_placements([[2,0],[2,1],[2,2][2,3]])
     @p.place_ship_on_board
     assert_equal [[0,0],[0,1]], @p.ships[0].placement
+  end
+
+  def test_player_ships_can_be_damaged
+    @p.add_ship(Ship.new(4))
+    @p.ships[0].place_on_game_board([[0,0],[0,1],[0,2],[0,3]])
+    @p.ship_damaged([0,2])
+    assert_equal ["O","O","X","O"], @p.ships[0].current_state
   end
 
 end

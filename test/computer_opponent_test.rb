@@ -76,7 +76,17 @@ class TestComputerOpponent < Minitest::Test
     @compy.generate_ship_locations
     assert_equal 2, @compy.ships[0].placement.length
     assert_equal 3, @compy.ships[1].placement.length
-    assert_equal 5, @compy.all_ship_placements.length  
+    assert_equal 5, @compy.all_ship_placements.length
+  end
+
+  def test_computers_downed_ships_are_displayed
+    skip
+    @compy.add_ship(Ship.new(3))
+    @compy.add_ship(Ship.new)
+    @compy.ships[1].shot(0)
+    @compy.ships[1].shot(1)
+    @compy.ships[1].shot(2)
+    assert @compy.display_downed_ships
   end
 
 end

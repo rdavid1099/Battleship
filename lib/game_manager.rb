@@ -2,6 +2,7 @@ require './lib/game_board'
 require './lib/player'
 require './lib/computer_opponent'
 require './lib/ship'
+require 'colorize'
 
 class GameManager
   attr_reader :game_board,
@@ -14,44 +15,46 @@ class GameManager
   end
 
   def launch
-    @player = Player.new('TESTING')
-    # @player = Player.new(get_player_name)
-    # board_size = create_game_board
-    board_size = 4
+    # @player = Player.new('TESTING')
+    @player = Player.new(get_player_name)
+    board_size = create_game_board
+    # board_size = 4
     @game_board = GameBoard.new(board_size)
     @player.game_board = GameBoard.new(board_size)
+    @player.opponent_game_board = @game_board
     @computer_opponent = ComputerOpponent.new(GameBoard.new(board_size))
-    # puts title_screen
-    # start_round
+    puts title_screen
+    start_game
   end
 
   def get_player_name
-    # print "Welcome to BATTLESHIP.\nBefore we begin, please enter your name.\n> "
-    # name = gets.chomp
-    name = 'TESTING'
+    print "Welcome to BATTLESHIP.\nBefore we begin, please enter your name.\n> "
+    name = gets.chomp
+    # name = 'TESTING'
     confirm_player_name(name)
   end
 
   def confirm_player_name(name)
-    # print "You entered: #{name}. Is that correct (Y/N)?\n> "
-    # answer = gets.chomp.downcase
-    answer = 'y'
+    print "You entered: #{name}. Is that correct (Y/N)?\n> "
+    answer = gets.chomp.downcase
+    # answer = 'y'
     if yes_or_no_confirmed?(answer)
       answer == 'y' ? name : get_player_name
     end
   end
 
   def create_game_board
-    difficulty = user_chooses_difficulty
-    difficulty * 4
+    @difficulty = user_chooses_difficulty
+    @difficulty * 4
   end
 
   def user_chooses_difficulty
-    print "Thank you, #{player.name}.\nPlease select the level of difficulty.\n1. Beginner (4x4 map)\n2. Intermediate (8x8 map)\n3. Advanced (12x12 map)\n> "
-    difficulty = gets.chomp.to_i
-    return difficulty unless difficulty <= 0 || difficulty > 3
-    puts "You must select one of the difficuly levels."
-    user_chooses_difficulty
+    loop do
+      print "Thank you, #{player.name}.\nPlease select the level of difficulty.\n1. Beginner (4x4 map)\n2. Intermediate (8x8 map)\n3. Advanced (12x12 map)\n> "
+      difficulty = gets.chomp.to_i
+      return difficulty unless difficulty <= 0 || difficulty > 3
+      puts "You must select one of the difficuly levels."
+    end
   end
 
   def start_game
@@ -63,9 +66,9 @@ class GameManager
 
   def welcome_menu
     loop do
-      # print "Welcome to BATTLESHIP\n\nWould you like to (p)lay, read the (i)nstructions, or (q)uit?\n> "
-      # user_input = gets.chomp.downcase
-      user_input = "p"
+      print "Welcome to BATTLESHIP\n\nWould you like to (p)lay, read the (i)nstructions, or (q)uit?\n> "
+      user_input = gets.chomp.downcase
+      # user_input = "p"
       return user_input if valid_welcome_input(user_input)
       puts "Your selection is not valid."
     end
@@ -95,15 +98,68 @@ class GameManager
   def play_game
     loop do
       main_game_display
-      get_player_next_move(in_game_options_menu_display)
+      player_choice = in_game_options_menu_display
+      get_player_next_move(player_choice)
+      unless player_choice == 'a'
+        break if boats_sunk?('computer')
+        computer_launch_attack
+        break if boats_sunk?('player')
+      end
+    end
+    end_game('win') if boats_sunk?('computer')
+    end_game('lose') if boats_sunk?('player')
+  end
+
+  def computer_launch_attack
+    register_attack_coordinates(computer_opponent.generate_strike, 'computer')
+  end
+
+  def user_launch_attack
+    print "Launch your attack!\nEnter the coordinates you would like to shoot.\n> "
+    register_attack_coordinates(player.input, 'player')
+  end
+
+  def register_attack_coordinates(player_input, player_or_computer)
+    if shot_hits_a_ship?(player_input, player_or_computer)
+      record_damage(player_input, player_or_computer)
+    else
+      game_board.mark_shot(player_input[0],player_input[1])
+    end
+  end
+
+  def record_damage(player_input, player_or_computer)
+    if player_or_computer == 'player'
+      game_board.mark_hit(player_input[0],player_input[1])
+      computer_opponent.ship_damaged(player_input)
+    else
+      player.game_board.mark_hit(player_input[0],player_input[1])
+      player.ship_damaged(player_input)
+    end
+  end
+
+  def shot_hits_a_ship?(player_input, player_or_computer)
+    if player_or_computer == 'player'
+      computer_opponent.all_ship_placements.any? {|coordinate| coordinate == player_input}
+    else
+      player.all_ship_placements.any? {|coordinate| coordinate == player_input}
+    end
+  end
+
+  def boats_sunk?(player_or_computer)
+    if player_or_computer == 'computer'
+      return computer_opponent.ships.all? { |boat| boat.under_the_sea? }
+    else
+      return player.ships.all? { |boat| boat.under_the_sea? }
     end
   end
 
   def end_game(outcome)
     if outcome == 'quit'
       exit_game unless play_another_game
+    elsif outcome == 'win'
+      exit_game
     else
-
+      exit_game
     end
     # Output a sorry or congratulations message
     # Output how many shots it took the winner to sink the opponent's ships
@@ -112,7 +168,7 @@ class GameManager
 
   def exit_game
     puts "Thank you for playing BATTLESHIP!"
-    exit
+    abort
   end
 
   def main_game_display
@@ -138,6 +194,11 @@ class GameManager
     puts "Percentage Hit: #{((total_hits.to_f / total_shots) * 100).round}"
   end
 
+  def downed_enemy_ships_stats
+    puts "FALLEN ENEMY SHIPS!".center(59)
+    computer_opponent.display_downed_ships
+  end
+
   def in_game_options_menu_display
     print "Enter your next move or (Q)uit:\nDisplay (F)leet Status, Display Enemy's (D)owned Ships\nGame (S)tats, Fire (A)ttack\n> "
     validate_menu_input(gets.chomp.downcase)
@@ -150,8 +211,8 @@ class GameManager
   end
 
   def get_player_next_move(user_choice)
-    # ATTACK
-    # DOWNED ENEMY SHIPS
+    user_launch_attack if user_choice == 'a'
+    downed_enemy_ships_stats if user_choice == 'd'
     display_player_fleet_status if user_choice == 'f'
     game_stats if user_choice == 's'
     end_game("quit") if user_choice == 'q'
@@ -180,11 +241,12 @@ class GameManager
 
   def build_ships
     counter = 1 + @difficulty
+    ship_size = 2
     counter.times do
-      ship = Ship.new(counter)
+      ship = Ship.new(ship_size)
       player.add_ship(ship)
       computer_opponent.add_ship(ship)
-      counter += 1
+      ship_size += 1
     end
   end
 
@@ -201,7 +263,7 @@ class GameManager
   end
 
   def title_screen
-    '______  ___ _____ _____ _     _____ _____ _   _ ___________
+    '  ______  ___ _____ _____ _     _____ _____ _   _ ___________
   | ___ \/ _ |_   _|_   _| |   |  ___/  ___| | | |_   _| ___ \
   | |_/ / /_\ \| |   | | | |   | |__ \ `--.| |_| | | | | |_/ /
   | ___ |  _  || |   | | | |   |  __| `--. |  _  | | | |  __/

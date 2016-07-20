@@ -1,6 +1,8 @@
-require './lib/player'
+require './lib/coordinate_manager'
 
-class ComputerOpponent < Player
+class ComputerOpponent
+  include CoordinateManager
+
   attr_reader   :ships,
                 :all_ship_placements
 
@@ -13,6 +15,16 @@ class ComputerOpponent < Player
     @all_ship_placements = Array.new
   end
 
+  def add_ship(ship)
+    @ships << ship
+  end
+
+  def ship_damaged(coordinates)
+    @ships.each do |ship|
+      ship.placement.each.with_index { |placement, index| ship.shot(index) if placement == coordinates}
+    end
+  end
+
   def generate_strike
     [rand(game_board.size - 1), rand(game_board.size - 1)]
   end
@@ -22,10 +34,6 @@ class ComputerOpponent < Player
       strike = generate_strike
       return strike if game_board.valid_shot?(strike[0], strike[1])
     end
-  end
-
-  def add_ship(ship)
-    @ships << ship
   end
 
   def update_all_ship_placements(ship_coordinates)
@@ -62,11 +70,17 @@ class ComputerOpponent < Player
       return available_coordinates[computer_choice] if computer_choice < available_coordinates.length
     end
   end
+  
+  # def reset
+  #   @ships = []
+  #   @all_ship_placements = []
+  #   game_board.clear_game_board
+  # end
 
-  def reset
-    @ships = []
-    @all_ship_placements = []
-    game_board.clear_game_board
+  def display_downed_ships
+    ships.each do |ship|
+      puts ship.status if ship.under_the_sea?
+    end
   end
 
 end
