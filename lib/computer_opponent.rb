@@ -32,7 +32,10 @@ class ComputerOpponent
   def computers_turn
     loop do
       strike = generate_strike
-      return strike if game_board.valid_shot?(strike[0], strike[1])
+      if game_board.valid_shot?(strike[0], strike[1])
+        game_board.mark_shot(strike[0], strike[1])
+        return strike
+      end
     end
   end
 
@@ -70,12 +73,6 @@ class ComputerOpponent
       return available_coordinates[computer_choice] if computer_choice < available_coordinates.length
     end
   end
-  
-  # def reset
-  #   @ships = []
-  #   @all_ship_placements = []
-  #   game_board.clear_game_board
-  # end
 
   def display_downed_ships
     ships.each do |ship|

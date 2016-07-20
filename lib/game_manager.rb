@@ -90,7 +90,7 @@ class GameManager
   def ship_placement_confirmed
     puts "Here is where you have placed your ships."
     puts player.game_board.generate_current_display
-    print "Are you satisfied with your placements?\n> "
+    print "Are you satisfied with your placements (Y/N)?\n> "
     user_satisfied = gets.chomp.downcase
     user_satisfied if yes_or_no_confirmed?(user_satisfied)
   end
@@ -100,18 +100,17 @@ class GameManager
       main_game_display
       player_choice = in_game_options_menu_display
       get_player_next_move(player_choice)
-      unless player_choice == 'a'
+      if player_choice == 'a'
         break if boats_sunk?('computer')
         computer_launch_attack
         break if boats_sunk?('player')
       end
     end
-    end_game('win') if boats_sunk?('computer')
-    end_game('lose') if boats_sunk?('player')
+    boats_sunk?('computer') ? end_game('win') : end_game('lose')
   end
 
   def computer_launch_attack
-    register_attack_coordinates(computer_opponent.generate_strike, 'computer')
+    register_attack_coordinates(computer_opponent.computers_turn, 'computer')
   end
 
   def user_launch_attack
@@ -123,7 +122,8 @@ class GameManager
     if shot_hits_a_ship?(player_input, player_or_computer)
       record_damage(player_input, player_or_computer)
     else
-      game_board.mark_shot(player_input[0],player_input[1])
+      game_board.mark_shot(player_input[0],player_input[1]) if player_or_computer == 'player'
+      player.game_board.mark_shot(player_input[0],player_input[1]) if player_or_computer == 'computer'
     end
   end
 
@@ -147,15 +147,15 @@ class GameManager
 
   def boats_sunk?(player_or_computer)
     if player_or_computer == 'computer'
-      return computer_opponent.ships.all? { |boat| boat.under_the_sea? }
+      computer_opponent.ships.all? { |boat| boat.under_the_sea? }
     else
-      return player.ships.all? { |boat| boat.under_the_sea? }
+      player.ships.all? { |boat| boat.under_the_sea? }
     end
   end
 
   def end_game(outcome)
     if outcome == 'quit'
-      exit_game unless play_another_game
+      exit_game
     elsif outcome == 'win'
       exit_game
     else
@@ -184,14 +184,14 @@ class GameManager
   end
 
   def game_stats
-    total_shots = player.game_board.total_number_of_shots
-    total_hits = player.game_board.total_number_of_hits
-    total_misses = player.game_board.total_number_of_shots - player.game_board.total_number_of_hits
+    total_shots = game_board.total_number_of_shots
+    total_hits = game_board.total_number_of_hits
+    total_misses = game_board.total_number_of_shots - game_board.total_number_of_hits
     puts "GAME STATS\n===================="
     puts "Total shots fired: #{total_shots}"
     puts "Shots Landed: #{total_hits}"
     puts "Shots Missed: #{total_misses}"
-    puts "Percentage Hit: #{((total_hits.to_f / total_shots) * 100).round}"
+    puts "Percentage Hit: #{((total_hits / total_shots.to_f) * 100).round}%" if total_shots > 0
   end
 
   def downed_enemy_ships_stats
@@ -243,21 +243,14 @@ class GameManager
     counter = 1 + @difficulty
     ship_size = 2
     counter.times do
-      ship = Ship.new(ship_size)
-      player.add_ship(ship)
-      computer_opponent.add_ship(ship)
+      player.add_ship(Ship.new(ship_size))
+      computer_opponent.add_ship(Ship.new(ship_size))
       ship_size += 1
     end
   end
 
   def instructions
-    puts "Battleship (or Battleships) is a game for two players where you
-    try to guess the location of ships your opponent has hidden
-    on a grid. Players take turns calling out a row and column,
-    attempting to name a square containing enemy ships. Originally
-    published as Broadsides by Milton Bradley in 1931,
-    the game was eventually reprinted as Battleship.
-    PRESS ENTER TO CONTINUE"
+    puts "Battleship (or Battleships) is a game for two players where you \ntry to guess the location of ships your opponent has hidden \non a grid. Players take turns calling out a row and column, \nattempting to name a square containing enemy ships. Originally \npublished as Broadsides by Milton Bradley in 1931, \nthe game was eventually reprinted as Battleship.\n\nPRESS ENTER TO CONTINUE"
     gets.chomp
     start_game
   end

@@ -42,13 +42,14 @@ class GameBoard
       @total_number_of_shots += 1
       return [y_cooridnate, x_cooridnate]
     else
-      return "Coordinates already shot"
+      return "Coordinates already shot\n> "
     end
   end
 
   def mark_hit(y_coordinate, x_cooridnate)
     @current_game_board[y_coordinate][x_cooridnate] = 'H'
     @total_number_of_hits += 1
+    @total_number_of_shots += 1
   end
 
   def valid_shot?(y_coordinate, x_cooridnate)
