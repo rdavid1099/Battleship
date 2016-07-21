@@ -33,6 +33,7 @@ module CoordinateManager
     @ships = []
     @all_ship_placements = []
     game_board.clear_game_board
+    opponent_game_board.clear_game_board
   end
 
 end

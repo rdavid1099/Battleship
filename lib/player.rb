@@ -111,14 +111,14 @@ class Player
 
   def converted_input(input)
     formatted_input = split(input)
-    return coordinates_not_valid unless valid_coordinates?(formatted_input)
     formatted_input.reverse! if formatted_input[0] =~ /[0-9]/
+    return coordinates_not_valid unless valid_coordinates?(formatted_input)
     formatted_input
   end
 
   def split(input)
     split_chars = input.map { |char| char if char =~ /[a-z0-9]/ }.compact
-    return split_chars unless split_chars.length != 2
+    return split_chars if split_chars.length == 2
     return split_chars.push("Z") if split_chars.length == 1
     combine_split_numbers(split_chars)
   end
@@ -132,7 +132,7 @@ class Player
 
   def valid_coordinates?(input)
     return false if input.all? { |char| char =~ /[a-z]/ }
-    return false if input.any? { |char| char =~ /0/ }
+    return false if input.any? { |char| char =~ /0/ } && input[1].length < 2
     true
   end
 

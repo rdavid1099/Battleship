@@ -151,7 +151,7 @@ class GameManager
   def end_game(outcome)
     puts "\e[H\e[2J"
     if outcome == 'win'
-      puts "CONGRATULATIONS!  Your enemies tremble at the thought of your unstoppable fleet."
+      puts "CONGRATULATIONS #{player.name.upcase}!".yellow + " Your enemies tremble at the thought of your unstoppable fleet."
       game_stats
     elsif outcome == 'lose'
       puts "Broken, beaten, and scarred, your enemy leaves you defeated.\nYour enemy may have won the battle, but the war is far from over."

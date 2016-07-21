@@ -114,7 +114,7 @@ class TestGameBoard < Minitest::Test
   def test_board_allows_shot_unless_its_not_valid
     @g.mark_shot(0,0)
     refute @g.valid_shot?(0,0)
-    assert_equal "Coordinates already shot", @g.mark_shot(0,0)
+    assert_equal "Coordinates already shot\n> ", @g.mark_shot(0,0)
   end
 
   def test_board_returns_coordinates_if_shot_is_valid_and_marked
