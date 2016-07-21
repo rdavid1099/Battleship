@@ -90,6 +90,8 @@ class GameManager
   end
 
   def play_game
+    print_mission_op
+    puts "\e[H\e[2J"
     loop do
       main_game_display
       player_choice = in_game_options_menu_display
@@ -259,6 +261,29 @@ class GameManager
       computer_opponent.add_ship(Ship.new(ship_size))
       ship_size += 1
     end
+  end
+
+  def print_mission_op
+    puts "\e[H\e[2J"
+    mission1 = "ATTENTION ADMIRAL...INTEL TELLS US AN ENEMY FLEET HAS US IN THEIR SIGHTS..."
+    mission2 = "...YOUR MISSION IS TO DESTROY ALL ENEMY SHIPS...BEFORE YOUR FLEET IS DESTROYED..."
+    mission3 = "...IT'S A DOG EAT DOG WORLD OUT THERE...AND YOU'RE OUR ONLY HOPE."
+    mission1.chars.each do |letter|
+      print letter
+      sleep(0.15)
+    end
+    print "\n"
+    mission2.chars.each do |letter|
+      print letter
+      sleep(0.15)
+    end
+    print "\n"
+    mission3.chars.each do |letter|
+      print letter
+      sleep(0.15)
+    end
+    sleep(2)
+    print "\n"
   end
 
   def instructions
