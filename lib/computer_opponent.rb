@@ -7,12 +7,14 @@ class ComputerOpponent
                 :all_ship_placements
 
   attr_accessor :current_ship,
-                :game_board
+                :game_board,
+                :opponent_game_board
 
   def initialize(game_board = GameBoard.new)
     @game_board = game_board
     @ships = Array.new
     @all_ship_placements = Array.new
+    @opponent_game_board = GameBoard.new(game_board.size)
   end
 
   def add_ship(ship)
@@ -26,14 +28,14 @@ class ComputerOpponent
   end
 
   def generate_strike
-    [rand(game_board.size - 1), rand(game_board.size - 1)]
+    [rand(game_board.size), rand(game_board.size)]
   end
 
   def computers_turn
     loop do
       strike = generate_strike
-      if game_board.valid_shot?(strike[0], strike[1])
-        game_board.mark_shot(strike[0], strike[1])
+      if opponent_game_board.valid_shot?(strike[0], strike[1])
+        opponent_game_board.mark_shot(strike[0], strike[1])
         return strike
       end
     end

@@ -1,3 +1,5 @@
+require 'colorize'
+
 class Ship
   attr_reader :size,
               :current_state,
@@ -19,15 +21,15 @@ class Ship
   end
 
   def under_the_sea?
-    @current_state.all? { |damage| damage == 'X' }
+    @current_state.all? { |damage| damage == 'X'.red }
   end
 
   def shot(location)
-    @current_state[location] = 'X' if shot_hits_ship?(location)
+    @current_state[location] = 'X'.red if shot_hits_ship?(location)
   end
 
   def shot_hits_ship?(location)
-    location < size && @current_state[location] != 'X'
+    location < size && @current_state[location] != 'X'.red
   end
 
   def place_on_game_board(placement)
@@ -47,10 +49,10 @@ class Ship
   end
 
   def health_bar
-    return "[xX UNDER THE SEA! Xx]" if under_the_sea?
+    return "[xX UNDER THE SEA! Xx]".red if under_the_sea?
     health_bar_length = health_left_percentage/5
     empty_space = 20 - health_bar_length
-    "[" + "*"*health_bar_length + " "*empty_space + "]"
+    "[" + "#{"*".green}"*health_bar_length + " "*empty_space + "]"
   end
 
   def visual_ship

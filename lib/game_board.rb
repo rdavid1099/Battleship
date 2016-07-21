@@ -1,3 +1,5 @@
+require 'colorize'
+
 class GameBoard
   attr_reader :current_game_board,
               :total_number_of_shots,
@@ -35,7 +37,7 @@ class GameBoard
   def mark_shot(y_cooridnate, x_cooridnate)
     if valid_shot?(y_cooridnate, x_cooridnate)
       unless @current_game_board[y_cooridnate][x_cooridnate] == 'O'
-        @current_game_board[y_cooridnate][x_cooridnate] = 'M'
+        @current_game_board[y_cooridnate][x_cooridnate] = 'M'.yellow
       else
         mark_hit(y_cooridnate, x_cooridnate)
       end
@@ -47,7 +49,7 @@ class GameBoard
   end
 
   def mark_hit(y_coordinate, x_cooridnate)
-    @current_game_board[y_coordinate][x_cooridnate] = 'H'
+    @current_game_board[y_coordinate][x_cooridnate] = 'H'.red
     @total_number_of_hits += 1
     @total_number_of_shots += 1
   end

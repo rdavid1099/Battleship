@@ -15,6 +15,7 @@ class GameManager
   end
 
   def launch
+    puts "\e[H\e[2J"
     # @player = Player.new('TESTING')
     @player = Player.new(get_player_name)
     board_size = create_game_board
@@ -28,19 +29,8 @@ class GameManager
   end
 
   def get_player_name
-    print "Welcome to BATTLESHIP.\nBefore we begin, please enter your name.\n> "
+    print "Welcome to #{"BATTLESHIP".red}.\nBefore we begin, please enter your name.\n> "
     name = gets.chomp
-    # name = 'TESTING'
-    confirm_player_name(name)
-  end
-
-  def confirm_player_name(name)
-    print "You entered: #{name}. Is that correct (Y/N)?\n> "
-    answer = gets.chomp.downcase
-    # answer = 'y'
-    if yes_or_no_confirmed?(answer)
-      answer == 'y' ? name : get_player_name
-    end
   end
 
   def create_game_board
@@ -50,7 +40,7 @@ class GameManager
 
   def user_chooses_difficulty
     loop do
-      print "Thank you, #{player.name}.\nPlease select the level of difficulty.\n1. Beginner (4x4 map)\n2. Intermediate (8x8 map)\n3. Advanced (12x12 map)\n> "
+      print "Thank you, #{player.name}.\nPlease select the level of difficulty.\n1. #{"Beginner (4x4 map)".green}\n2. #{"Intermediate (8x8 map)".yellow}\n3. #{"Advanced (12x12 map)".red}\n> "
       difficulty = gets.chomp.to_i
       return difficulty unless difficulty <= 0 || difficulty > 3
       puts "You must select one of the difficuly levels."
@@ -65,8 +55,9 @@ class GameManager
   end
 
   def welcome_menu
+    puts "\e[H\e[2J"
     loop do
-      print "Welcome to BATTLESHIP\n\nWould you like to (p)lay, read the (i)nstructions, or (q)uit?\n> "
+      print "Welcome to #{"BATTLESHIP".red}\n\nWould you like to (p)lay, read the (i)nstructions, or (q)uit?\n> "
       user_input = gets.chomp.downcase
       # user_input = "p"
       return user_input if valid_welcome_input(user_input)
@@ -75,7 +66,9 @@ class GameManager
   end
 
   def setup_round
+    puts "\e[H\e[2J"
     clear_game_board
+    @timer_start = Time.new
     puts "LET'S PLAY BATTLESHIP!"
     build_ships
     player.place_ship_on_board
@@ -88,6 +81,7 @@ class GameManager
   end
 
   def ship_placement_confirmed
+    puts "\e[H\e[2J"
     puts "Here is where you have placed your ships."
     puts player.game_board.generate_current_display
     print "Are you satisfied with your placements (Y/N)?\n> "
@@ -116,6 +110,7 @@ class GameManager
   def user_launch_attack
     print "Launch your attack!\nEnter the coordinates you would like to shoot.\n> "
     register_attack_coordinates(player.input, 'player')
+    puts "\e[H\e[2J"
   end
 
   def register_attack_coordinates(player_input, player_or_computer)
@@ -154,16 +149,26 @@ class GameManager
   end
 
   def end_game(outcome)
-    if outcome == 'quit'
-      exit_game
-    elsif outcome == 'win'
-      exit_game
-    else
-      exit_game
+    puts "\e[H\e[2J"
+    if outcome == 'win'
+      puts "CONGRATULATIONS!  Your enemies tremble at the thought of your unstoppable fleet."
+      game_stats
+    elsif outcome == 'lose'
+      puts "Broken, beaten, and scarred, your enemy leaves you defeated.\nYour enemy may have won the battle, but the war is far from over."
+      game_stats
     end
-    # Output a sorry or congratulations message
-    # Output how many shots it took the winner to sink the opponent's ships
-    # Output the total time that the game took to play
+    exit_game unless play_another_game?
+    start_game
+  end
+
+  def play_another_game?
+    print "Would you like to play another game (Y/N)?\n> "
+    answer = gets.chomp.downcase
+    if yes_or_no_confirmed?(answer) && answer == 'y'
+      true
+    else
+      false
+    end
   end
 
   def exit_game
@@ -179,11 +184,15 @@ class GameManager
   end
 
   def display_player_fleet_status
+    puts "\e[H\e[2J"
     puts "STATUS OF #{player.name.upcase}'S FLEET".center(59)
     player.ships.each { |ship| puts ship.status }
   end
 
   def game_stats
+    puts "\e[H\e[2J"
+    @timer_now = Time.new
+    total_time = ((@timer_now - @timer_start) / 60).round
     total_shots = game_board.total_number_of_shots
     total_hits = game_board.total_number_of_hits
     total_misses = game_board.total_number_of_shots - game_board.total_number_of_hits
@@ -192,9 +201,11 @@ class GameManager
     puts "Shots Landed: #{total_hits}"
     puts "Shots Missed: #{total_misses}"
     puts "Percentage Hit: #{((total_hits / total_shots.to_f) * 100).round}%" if total_shots > 0
+    puts "Total Playtime: #{total_time} minutes"
   end
 
   def downed_enemy_ships_stats
+    puts "\e[H\e[2J"
     puts "FALLEN ENEMY SHIPS!".center(59)
     computer_opponent.display_downed_ships
   end
@@ -219,6 +230,7 @@ class GameManager
   end
 
   def clear_game_board
+    @timer_start = nil
     player.reset
     computer_opponent.reset
   end
@@ -250,12 +262,14 @@ class GameManager
   end
 
   def instructions
+    puts "\e[H\e[2J"
     puts "Battleship (or Battleships) is a game for two players where you \ntry to guess the location of ships your opponent has hidden \non a grid. Players take turns calling out a row and column, \nattempting to name a square containing enemy ships. Originally \npublished as Broadsides by Milton Bradley in 1931, \nthe game was eventually reprinted as Battleship.\n\nPRESS ENTER TO CONTINUE"
     gets.chomp
     start_game
   end
 
   def title_screen
+    puts "\e[H\e[2J"
     '  ______  ___ _____ _____ _     _____ _____ _   _ ___________
   | ___ \/ _ |_   _|_   _| |   |  ___/  ___| | | |_   _| ___ \
   | |_/ / /_\ \| |   | | | |   | |__ \ `--.| |_| | | | | |_/ /
